@@ -34,7 +34,9 @@ export function BoardView() {
   }, [currentLevel, displayLevelNumber, settings.addonLevel, settings.addonCost]);
 
   return (
-    <div className='w-full h-full lg:absolute lg:inset-0 p-2 sm:p-4 flex flex-col gap-4 font-sans select-none overflow-y-auto lg:overflow-hidden bg-slate-950'>
+    /* ИСПРАВЛЕНО: Убран класс absolute inset-0. Теперь блок занимает ровно flex-1 
+       от доступной высоты main-контейнера и больше никогда не перекрывается шапкой! */
+    <div className='w-full h-full flex flex-col gap-4 font-sans select-none overflow-y-auto lg:overflow-hidden bg-slate-950'>
       {/* ЦЕНТРАЛЬНЫЙ РЯД СТРУКТУРЫ */}
       <div className='grid grid-cols-1 lg:grid-cols-4 gap-4 flex-1 items-stretch'>
         {/* БЛОК А: Текущие блайнды */}
@@ -61,15 +63,13 @@ export function BoardView() {
         <div className='lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 flex flex-col justify-between items-center text-center shadow-2xl relative min-h-[260px] lg:min-h-0'>
           <span className='text-xs font-semibold uppercase tracking-wider text-slate-400'>{currentLevel?.isBreak ? 'Идет перерыв' : 'Осталось времени'}</span>
 
-          {/* Возвращен гигантский десктопный размер шрифта */}
           <div className='font-mono text-6xl sm:text-8xl lg:text-9xl xl:text-[11.5rem] font-bold text-white tracking-wide leading-none my-auto'>{formatTime(timeLeft)}</div>
 
-          {/* ДОБАВЛЕНО: Кнопки оперативного управления временем дилером прямо на табло */}
           <div className='flex gap-2 mb-3'>
-            <button onClick={() => addTimeToCurrentRound(60)} className='bg-slate-950 hover:bg-slate-850 border border-slate-800 text-slate-400 hover:text-white px-3 py-1 rounded text-xxs font-mono font-bold uppercase transition'>
+            <button onClick={() => addTimeToCurrentRound(60)} className='bg-slate-950 hover:bg-slate-850 border border-slate-800 text-slate-400 hover:text-white px-3 py-1 rounded text-xxs font-mono font-bold uppercase transition cursor-pointer'>
               +1 мин
             </button>
-            <button onClick={() => addTimeToCurrentRound(300)} className='bg-slate-950 hover:bg-slate-850 border border-slate-800 text-slate-400 hover:text-white px-3 py-1 rounded text-xxs font-mono font-bold uppercase transition'>
+            <button onClick={() => addTimeToCurrentRound(300)} className='bg-slate-950 hover:bg-slate-850 border border-slate-800 text-slate-400 hover:text-white px-3 py-1 rounded text-xxs font-mono font-bold uppercase transition cursor-pointer'>
               +5 мин
             </button>
           </div>
@@ -107,7 +107,7 @@ export function BoardView() {
         </div>
       </div>
 
-      {/* НИЖНИЙ РЯД СТАТИСТИКИ */}
+      {/* НИЖНИЙ РЯД ДЕТАЛЬНОЙ СТАТИСТИКИ */}
       <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4 lg:h-32 shrink-0 ${showCurrency ? 'lg:grid-cols-4' : 'lg:grid-cols-3'}`}>
         <div className='bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between shadow-md'>
           <span className='text-xs font-semibold uppercase tracking-wider text-slate-400 block'>В игре участников</span>
