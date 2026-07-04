@@ -59,9 +59,8 @@ export default function App() {
             Пред. уровень
           </button>
 
-          {/* ИСПРАВЛЕНО: Убран принудительный капс со слов Старт / Пауза */}
-          <button onClick={toggleTimer} className={`font-semibold text-sm px-8 h-10 rounded-lg transition active:scale-95 shadow-lg cursor-pointer ${isTimerRunning ? 'bg-slate-800 hover:bg-slate-750 text-white border border-slate-700' : 'bg-white hover:bg-slate-200 text-black scale-105'}`}>
-            {isTimerRunning ? 'Пауза' : 'Старт'}
+          <button onClick={toggleTimer} className={`font-semibold text-xs tracking-widest uppercase px-8 h-10 rounded-lg transition active:scale-95 shadow-lg cursor-pointer ${isTimerRunning ? 'bg-slate-950 hover:bg-slate-900 text-rose-400 border border-rose-950' : 'bg-emerald-600 hover:bg-emerald-500 text-white scale-105 shadow-emerald-950/30'}`}>
+            {isTimerRunning ? 'Пауза' : 'Запустить таймер'}
           </button>
 
           <button onClick={handleNextLevel} className='bg-slate-850 hover:bg-slate-800 text-slate-300 border border-slate-700 font-medium text-xs px-4 h-9 rounded-lg transition active:scale-95 cursor-pointer'>
