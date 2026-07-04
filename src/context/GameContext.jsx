@@ -310,18 +310,15 @@ export const GameProvider = ({ children }) => {
   };
 
   const playerOut = playerName => {
-    // 1. Вычисляем сколько игроков сейчас за столом ДО этого вылета
     const livePlayersBefore = players.filter(name => {
       const playerEvents = events.filter(e => e.playerName === name);
       if (playerEvents.length === 0) return false;
       return playerEvents[playerEvents.length - 1].type !== 'PLAYER_OUT';
     });
 
-    // 2. Генерируем уникальный ID для события вылета
     const eventId = crypto.randomUUID();
     const outPlace = livePlayersBefore.length;
 
-    // 3. Формируем новый массив событий, добавляя аут
     const updatedEvents = [
       ...events,
       {
@@ -335,19 +332,16 @@ export const GameProvider = ({ children }) => {
 
     setEvents(updatedEvents);
 
-    // 4. ПРОВЕРКА НА ФИНАЛ: Считаем сколько игроков осталось в живых ПОСЛЕ этого вылета
     const livePlayersAfter = players.filter(name => {
-      // ИСПРАВЛЕНО: Теперь переменная везде называется одинаково (playerEvents)
       const playerEvents = updatedEvents.filter(e => e.playerName === name);
       if (playerEvents.length === 0) return false;
       return playerEvents[playerEvents.length - 1].type !== 'PLAYER_OUT';
     });
 
-    // Если остался ровно 1 выживший, принудительно останавливаем таймер игры
     if (livePlayersAfter.length === 1 && timerState.startedAt && !timerState.pausedAt) {
       setTimerState(prev => ({
         ...prev,
-        pausedAt: Date.now(), // Ставим системное время паузы
+        pausedAt: Date.now(),
       }));
     }
   };
@@ -397,32 +391,12 @@ export const GameProvider = ({ children }) => {
   }, [events, players]);
 
   return (
-    <GameContext.Provider
-      value={{
-        settings,
-        setSettings,
-        events,
-        players,
-        currentLevelIndex,
-        showCurrency,
-        setShowCurrency,
-        stats,
-        timeLeft,
-        displayLevelNumber,
-        isTimerRunning: timerState.startedAt && !timerState.pausedAt,
-        addPlayer,
-        playerRebuy,
-        playerOut,
-        playerAddon,
-        calculateNextRebuy,
-        undoLastEvent,
-        resetGame,
-        toggleTimer,
-        handleNextLevel,
-        handlePrevLevel,
-        addTimeToCurrentRound,
-      }}
-    >
+    <GameContext.Provider value={{
+      settings, setSettings, events, players, currentLevelIndex, showCurrency, setShowCurrency, stats, timeLeft, displayLevelNumber,
+      isTimerRunning: timerState.startedAt && !timerState.pausedAt,
+      addPlayer, playerRebuy, playerOut, playerAddon, calculateNextRebuy, undoLastEvent, resetGame,
+      toggleTimer, handleNextLevel, handlePrevLevel, addTimeToCurrentRound
+    }}>
       {children}
     </GameContext.Provider>
   );
