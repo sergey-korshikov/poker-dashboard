@@ -8,7 +8,7 @@ const formatTime = seconds => {
 };
 
 export function BoardView() {
-  const { timeLeft, settings, currentLevelIndex, stats, showCurrency, players, displayLevelNumber } = useGame();
+  const { timeLeft, settings, currentLevelIndex, stats, showCurrency, players, displayLevelNumber, addTimeToCurrentRound } = useGame();
 
   const currentLevel = settings.levels[currentLevelIndex];
 
@@ -34,39 +34,47 @@ export function BoardView() {
   }, [currentLevel, displayLevelNumber, settings.addonLevel, settings.addonCost]);
 
   return (
-    <div className='absolute inset-0 p-4 flex flex-col gap-4 font-sans select-none overflow-hidden bg-slate-950'>
+    <div className='w-full h-full lg:absolute lg:inset-0 p-2 sm:p-4 flex flex-col gap-4 font-sans select-none overflow-y-auto lg:overflow-hidden bg-slate-950'>
       {/* ЦЕНТРАЛЬНЫЙ РЯД СТРУКТУРЫ */}
       <div className='grid grid-cols-1 lg:grid-cols-4 gap-4 flex-1 items-stretch'>
         {/* БЛОК А: Текущие блайнды */}
-        <div className='bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between items-center text-center shadow-xl'>
-          {/* ДОБАВЛЕН КАПС: Для мелкого служебного текста */}
+        <div className='bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between items-center text-center shadow-xl min-h-[220px] lg:min-h-0'>
           <span className='text-xs font-semibold uppercase tracking-wider text-slate-400'>{currentLevel?.isBreak ? 'Статус турнира' : `Игровой раунд ${displayLevelNumber}`}</span>
 
-          <div className='my-auto py-4'>
+          <div className='my-auto py-2 sm:py-4'>
             {!currentLevel?.isBreak ? (
-              <div className='space-y-2'>
-                <div className='font-mono text-6xl xl:text-7xl font-bold tracking-wide text-white leading-none'>{currentLevel?.sb}</div>
-                <div className='text-slate-700 text-3xl font-light font-mono leading-none'>/</div>
-                <div className='font-mono text-6xl xl:text-7xl font-bold tracking-wide text-amber-400 leading-none'>{currentLevel?.bb}</div>
-                {currentLevel?.ante > 0 && <div className='text-base text-slate-300 bg-slate-950 border border-slate-800 px-4 py-1 rounded-xl inline-block mt-4 font-mono font-medium uppercase tracking-wide'>Анте: {currentLevel.ante}</div>}
+              <div className='space-y-1 sm:space-y-2'>
+                <div className='font-mono text-5xl sm:text-6xl lg:text-7xl font-bold tracking-wide text-white leading-none'>{currentLevel?.sb}</div>
+                <div className='text-slate-700 text-2xl font-light font-mono leading-none'>/</div>
+                <div className='font-mono text-5xl sm:text-6xl lg:text-7xl font-bold tracking-wide text-amber-400 leading-none'>{currentLevel?.bb}</div>
+                {currentLevel?.ante > 0 && <div className='text-xs sm:text-base text-slate-300 bg-slate-950 border border-slate-800 px-4 py-1 rounded-xl inline-block mt-2 sm:mt-4 font-mono font-medium uppercase tracking-wide'>Анте: {currentLevel.ante}</div>}
               </div>
             ) : (
-              <div className='font-mono text-5xl xl:text-6xl font-medium text-emerald-400 tracking-wider'>Перерыв</div>
+              <div className='font-mono text-4xl sm:text-5xl lg:text-6xl font-medium text-emerald-400 tracking-wider'>Перерыв</div>
             )}
           </div>
 
-          {/* ДОБАВЛЕН КАПС */}
           <span className='text-xs font-semibold uppercase tracking-wider text-slate-400'>Текущие ставки</span>
         </div>
 
-        {/* БЛОК Б: ОГРОМНЫЙ ГЛАВНЫЙ ТАЙМЕР */}
-        <div className='lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between items-center text-center shadow-2xl relative'>
-          {/* ДОБАВЛЕН КАПС */}
+        {/* БЛОК Б: ОГРОМНЫЙ ГЛАВНЫЙ ТАЙМЕР + ДОБАВЛЕНИЕ ВРЕМЕНИ */}
+        <div className='lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 flex flex-col justify-between items-center text-center shadow-2xl relative min-h-[260px] lg:min-h-0'>
           <span className='text-xs font-semibold uppercase tracking-wider text-slate-400'>{currentLevel?.isBreak ? 'Идет перерыв' : 'Осталось времени'}</span>
 
-          <div className='font-mono text-9xl xl:text-[12rem] font-bold text-white tracking-wide leading-none my-auto'>{formatTime(timeLeft)}</div>
+          {/* Возвращен гигантский десктопный размер шрифта */}
+          <div className='font-mono text-6xl sm:text-8xl lg:text-9xl xl:text-[11.5rem] font-bold text-white tracking-wide leading-none my-auto'>{formatTime(timeLeft)}</div>
 
-          <div className='text-sm font-mono text-slate-400 font-medium uppercase tracking-wide'>
+          {/* ДОБАВЛЕНО: Кнопки оперативного управления временем дилером прямо на табло */}
+          <div className='flex gap-2 mb-3'>
+            <button onClick={() => addTimeToCurrentRound(60)} className='bg-slate-950 hover:bg-slate-850 border border-slate-800 text-slate-400 hover:text-white px-3 py-1 rounded text-xxs font-mono font-bold uppercase transition'>
+              +1 мин
+            </button>
+            <button onClick={() => addTimeToCurrentRound(300)} className='bg-slate-950 hover:bg-slate-850 border border-slate-800 text-slate-400 hover:text-white px-3 py-1 rounded text-xxs font-mono font-bold uppercase transition'>
+              +5 мин
+            </button>
+          </div>
+
+          <div className='text-xs sm:text-sm font-mono text-slate-400 font-medium uppercase tracking-wide px-2 text-center'>
             {isAddonLevelActive ? (
               <span className='text-cyan-400 font-medium tracking-wide'>Период аддонов открыт</span>
             ) : (
@@ -78,68 +86,57 @@ export function BoardView() {
         </div>
 
         {/* БЛОК В: Следующий уровень */}
-        <div className='bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between items-center text-center shadow-xl'>
-          {/* ДОБАВЛЕН КАПС */}
+        <div className='bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 flex flex-col justify-between items-center text-center shadow-xl min-h-[180px] lg:min-h-0'>
           <span className='text-xs font-semibold uppercase tracking-wider text-slate-400'>Следующий раунд</span>
 
-          <div className='my-auto py-4'>
+          <div className='my-auto py-2 sm:py-4'>
             {nextLevel ? (
-              <div className='space-y-3 font-mono'>
-                {/* Добавлен мелкий капс подписи */}
-                <div className='text-slate-500 text-xs font-medium uppercase tracking-wider font-sans'>Будущие ставки:</div>
-                <div className='text-4xl xl:text-5xl font-bold text-slate-300'>
+              <div className='space-y-2 font-mono'>
+                <div className='text-slate-500 text-xs sm:text-sm font-medium uppercase tracking-wider font-sans'>Будущие ставки:</div>
+                <div className='text-2xl sm:text-4xl lg:text-5xl font-bold text-slate-300'>
                   {nextLevel.sb} <span className='text-slate-700'>/</span> {nextLevel.bb}
                 </div>
-                {nextLevel.ante > 0 && <div className='text-sm text-slate-400 font-medium bg-slate-950 px-3 py-1 rounded-lg inline-block border border-slate-850 uppercase tracking-wide'>Анте: {nextLevel.ante}</div>}
+                {nextLevel.ante > 0 && <div className='text-xs text-slate-400 font-medium bg-slate-950 px-2.5 py-0.5 rounded-lg inline-block border border-slate-850 uppercase tracking-wide'>Анте: {nextLevel.ante}</div>}
               </div>
             ) : (
-              <div className='text-slate-500 font-medium text-base'>Финальный раунд</div>
+              <div className='text-slate-500 font-medium text-sm sm:text-base'>Финальный раунд</div>
             )}
           </div>
 
-          {/* ДОБАВЛЕН КАПС */}
           <span className='text-xs font-semibold uppercase tracking-wider text-slate-400'>Следующая структура</span>
         </div>
       </div>
 
-      {/* НИЖНИЙ РЯД ДЕТАЛЬНОЙ СТАТИСТИКИ */}
-      <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 h-32 shrink-0 ${showCurrency ? 'lg:grid-cols-4' : 'lg:grid-cols-3'}`}>
-        {/* Блок 1: Живые участники */}
+      {/* НИЖНИЙ РЯД СТАТИСТИКИ */}
+      <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4 lg:h-32 shrink-0 ${showCurrency ? 'lg:grid-cols-4' : 'lg:grid-cols-3'}`}>
         <div className='bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between shadow-md'>
-          {/* ДОБАВЛЕН КАПС: Идентичный мелкий стиль во всех нижних блоках */}
           <span className='text-xs font-semibold uppercase tracking-wider text-slate-400 block'>В игре участников</span>
-          <div className='flex items-baseline justify-between mt-auto'>
+          <div className='flex items-baseline justify-between mt-3 lg:mt-auto'>
             <span className='font-mono text-4xl xl:text-5xl font-bold text-sky-400 leading-none'>{stats.playersInGame}</span>
             <span className='text-xs text-slate-500 font-mono font-medium uppercase tracking-wider'>из {players.length} всего</span>
           </div>
         </div>
 
-        {/* Блок 2: Всего входов */}
         <div className='bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between shadow-md'>
-          {/* ДОБАВЛЕН КАПС */}
           <span className='text-xs font-semibold uppercase tracking-wider text-slate-400 block'>Всего входов</span>
-          <div className='flex items-baseline justify-between mt-auto'>
+          <div className='flex items-baseline justify-between mt-3 lg:mt-auto'>
             <span className='font-mono text-4xl xl:text-5xl font-bold text-white leading-none'>{stats.totalEntries}</span>
             <span className='text-xs text-slate-500 font-mono font-medium uppercase tracking-wider'>входы и ребаи</span>
           </div>
         </div>
 
-        {/* Блок 3: Средний стек */}
         <div className='bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between shadow-md'>
-          {/* ДОБАВЛЕН КАПС */}
           <span className='text-xs font-semibold uppercase tracking-wider text-slate-400 block'>Средний стек фишек</span>
-          <div className='flex items-baseline justify-between mt-auto'>
+          <div className='flex items-baseline justify-between mt-3 lg:mt-auto'>
             <span className='font-mono text-3xl xl:text-4xl font-bold text-white leading-none'>{stats.averageStack.toLocaleString()}</span>
             <span className='text-xs text-slate-500 font-mono font-medium uppercase tracking-wider'>у каждого игрока</span>
           </div>
         </div>
 
-        {/* Блок 4: Призовой фонд */}
         {showCurrency && (
           <div className='bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between shadow-md'>
-            {/* ДОБАВЛЕН КАПС */}
             <span className='text-xs font-semibold uppercase tracking-wider text-slate-400 block'>Общий призовой фонд</span>
-            <div className='flex items-baseline justify-between mt-auto'>
+            <div className='flex items-baseline justify-between mt-3 lg:mt-auto'>
               <span className='font-mono text-3xl xl:text-4xl font-bold text-emerald-400 leading-none'>{stats.totalBank.toLocaleString()}</span>
               <span className='text-sm font-medium text-emerald-500 font-mono'>₽</span>
             </div>
