@@ -59,7 +59,7 @@ export function App() {
       </header>
 
       {/* ОСНОВНОЙ КОНТЕНТ ЭКРАНОВ */}
-      <main className='flex-1 p-6 flex flex-col items-center justify-center'>
+      <main className="flex-1 p-6 flex flex-col items-center justify-center relative"> {/* <-- Добавлен класс relative */}
         {currentView === 'board' && <BoardView />}
         {currentView === 'stats' && <StatsView />}
         {currentView === 'setup' && <SetupView />}
