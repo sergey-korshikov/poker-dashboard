@@ -237,55 +237,56 @@ export const GameProvider = ({ children }) => {
   };
 
   // ПОКЕРНАЯ ЭКОНОМИКА С ПОДДЕРЖКОЙ RE-ENTRY
-  const calculateNextRebuy = playerName => {
-    // 1. Извлекаем все ребаи игрока в хронологическом порядке (от старых к новым)
-    const playerRebuyEvents = events.filter(e => e.type === 'REBUY' && e.playerName === playerName);
+  const calculateNextRebuy = (playerName) => {
+    // 1. Извлекаем все ребаи игрока в хронологическом порядке
+    const playerRebuyEvents = events.filter(
+      e => e.type === 'REBUY' && e.playerName === playerName
+    );
 
     const currentLevel = settings.levels[currentLevelIndex];
     const isHeavyBlindsNow = currentLevel && currentLevel.bb >= settings.rebuyTriggerBB;
 
-    // 2. Начинаем расчет стоимости «следующего» ребая
+    // 2. Стартуем с базовой цены
     let currentCost = settings.buyInCost;
 
-    // 3. Симулируем историю: как росла бы цена игрока за КАЖДЫЙ его прошлый ребай
-    playerRebuyEvents.forEach((event, index) => {
-      // Нам важно знать, в какой момент турнира был сделан этот конкретный прошлый ребай.
-      // Но у нас есть железное правило из вашего примера:
-      // Если цена этого сделанного ребая была уже "тяжелой" (то есть >= удвоенной стартовой цене, 800р и выше),
-      // значит, этот ребай делался на тяжелой стадии, и после него цена должна удваиваться.
+    // 3. Симулируем историю строго по блайндам турнира
+    playerRebuyEvents.forEach((event) => {
+      // ИСПРАВЛЕНО: Теперь мы железно проверяем, на каком уровне блайндов был сделан этот прошлый ребай.
+      // Если на момент того ребая Большой Блайнд (bb) уже был тяжелым (например, >= 1600),
+      // то только тогда цена после него увеличивается умножением на 2.
+      const rebuyLevel = settings.levels.find(l => l.id === event.levelId) || event.currentLevel;
+      const isHeavyAtThatMoment = rebuyLevel && rebuyLevel.bb >= settings.rebuyTriggerBB;
 
-      if (event.cost >= settings.buyInCost * 2) {
+      if (isHeavyAtThatMoment) {
         currentCost = event.cost * 2;
       } else {
-        // Если ребай стоил меньше 800р (400 или 600), значит он делался на ранней стадии,
-        // и после него цена росла обычным шагом в 200р
+        // Если ребай сделан на ранней стадии — просто прибавляем обычный шаг 200р
         currentCost = event.cost + settings.rebuyBaseStep;
       }
     });
 
-    // 4. ТЕКУЩИЙ КЛИК (Расчет цены для ребая, который игрок хочет сделать ПРЯМО СЕЙЧАС):
-    // Если наступила тяжелая стадия, а игрок еще не заходил на нее (его текущая накопленная цена
-    // еще не была удвоена), мы должны принудительно удвоить её прямо сейчас.
+    // 4. Расчет для ребая, который игрок делает ПРЯМО СЕЙЧАС (текущий клик):
     if (isHeavyBlindsNow) {
-      // Проверяем: если последний ребай в истории уже был дорогим (800+),
-      // значит, текущая цена currentCost уже рассчитана с учетом удвоения на предыдущем шаге (внутри цикла).
-      // А вот если ребаев не было вообще или последний ребай был дешевым (до перехода) —
-      // это значит, что игрок ПЕРВЫЙ РАЗ покупает ребай на тяжелой стадии. Удваиваем его накопленную цену!
-      const lastEvent = playerRebuyEvents[playerRebuyEvents.length - 1];
-      const alreadyDoubledInHistory = lastEvent && lastEvent.cost >= settings.buyInCost * 2;
+      // Проверяем, заходил ли уже игрок на тяжелую стадию.
+      // Ищем, был ли хоть один ребай в истории сделан на тяжелых блайндах.
+      const hasAnyHeavyRebuyInHistory = playerRebuyEvents.some(event => {
+        const rebuyLevel = settings.levels.find(l => l.id === event.levelId) || event.currentLevel;
+        return rebuyLevel && rebuyLevel.bb >= settings.rebuyTriggerBB;
+      });
 
-      if (!alreadyDoubledInHistory) {
+      // Если в истории еще не было тяжелых ребаев, это значит, что игрок
+      // ПЕРВЫЙ РАЗ покупает ребай на тяжелой стадии. Мы должны принудительно удвоить его накопленную цену!
+      if (!hasAnyHeavyRebuyInHistory) {
         currentCost = currentCost * 2;
       }
-    } else {
-      // Если стадия ранняя — цена остается такой, какой ее накопил цикл (базовая + шаги по 200р)
     }
 
-    return {
-      cost: currentCost,
-      stack: settings.buyInStack,
+    return { 
+      cost: currentCost, 
+      stack: settings.buyInStack 
     };
   };
+
 
   const addPlayer = nameOrArray => {
     const newNames = Array.isArray(nameOrArray) ? nameOrArray : [nameOrArray];
@@ -304,9 +305,19 @@ export const GameProvider = ({ children }) => {
     setEvents(prev => [...prev, ...newEvents]);
   };
 
-  const playerRebuy = playerName => {
-    const { cost, stack } = calculateNextRebuy(playerName);
-    setEvents(prev => [...prev, { id: crypto.randomUUID(), type: 'REBUY', playerName, cost, stack, timestamp: Date.now() }]);
+  const playerRebuy = (playerName) => {
+    const nextRebuy = calculateNextRebuy(playerName);
+    const currentLevel = settings.levels[currentLevelIndex];
+
+    setEvents(prev => [...prev, {
+      id: crypto.randomUUID(),
+      type: 'REBUY',
+      playerName,
+      cost: nextRebuy.cost,
+      stack: nextRebuy.stack,
+      levelId: currentLevel?.id, // <-- ЖЕЛЕЗНО ПИШЕМ ID УРОВНЯ
+      timestamp: Date.now()
+    }]);
   };
 
   const playerOut = playerName => {
