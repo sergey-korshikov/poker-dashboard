@@ -1,18 +1,27 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
-/* Отключаем стрелочки для Chrome, Safari, Edge, Opera */
+@theme {
+  /* Заменяем стандартный шрифт без засечек на Inter */
+  --font-sans: 'Inter', sans-serif;
+
+  /* Заменяем моноширинный шрифт на Teko для таймера */
+  --font-mono: 'Teko', sans-serif;
+
+  /* Ваши кастомные цвета, если вы их добавляли ранее: */
+  --color-slate-750: #243242;
+  --color-slate-850: #121e2e;
+}
+
+/* Отключаем стрелочки для input type="number" (наши прошлые правки) */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
-
-/* Отключаем стрелочки для Firefox */
-input[type="number"] {
+input[type='number'] {
   -moz-appearance: textfield;
 }
 
-/* На всякий случай добавим глобальный pointer для всех кнопок в приложении */
 button {
   cursor: pointer;
 }

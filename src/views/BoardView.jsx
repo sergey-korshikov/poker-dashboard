@@ -88,16 +88,20 @@ export function BoardView() {
 
         {/* Текущие блайнды */}
         {!currentLevel?.isBreak ? (
-          <h1 className='text-5xl lg:text-6xl font-black text-white font-mono tracking-tight mb-6'>
-            {currentLevel?.sb} <span className='text-slate-600 font-light'>/</span> {currentLevel?.bb}
-            {currentLevel?.ante > 0 && <div className='text-lg text-amber-400/80 font-medium tracking-normal mt-1'>Анте: {currentLevel.ante}</div>}
+          <h1 className="text-6xl lg:text-7xl font-medium text-white font-mono tracking-wide mb-6">
+            {currentLevel?.sb} <span className="text-slate-650 font-light">/</span> {currentLevel?.bb}
+            {currentLevel?.ante > 0 && (
+              <div className="text-xl text-amber-400/80 font-medium tracking-normal mt-2">Анте: {currentLevel.ante}</div>
+            )}
           </h1>
         ) : (
           <h1 className='text-5xl lg:text-6xl font-black text-emerald-400 tracking-tight mb-6'>ПЕРЕРЫВ</h1>
         )}
 
-        {/* ОГРОМНЫЙ ТАЙМЕР */}
-        <div className='w-full font-mono text-7xl lg:text-8xl font-black text-slate-100 bg-slate-950/80 py-8 rounded-2xl border border-slate-800 shadow-inner mb-6 tracking-tighter'>{formatTime(timeLeft)}</div>
+        {/* ОГРОМНЫЙ ТАЙМЕР С НОВЫМ ШРИФТОМ */}
+        <div className="w-full font-mono text-8xl lg:text-9xl font-medium text-slate-100 bg-slate-950/80 py-4 rounded-2xl border border-slate-800 shadow-inner mb-6 tracking-wide leading-none">
+          {formatTime(timeLeft)}
+        </div>
 
         {/* Дополнительная инфа под таймером */}
         <div className='w-full grid grid-cols-2 gap-4 text-left border-t border-slate-800 pt-4'>

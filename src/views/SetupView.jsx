@@ -98,38 +98,38 @@ export function SetupView() {
           <div className='grid grid-cols-2 gap-4'>
             <div>
               <label className='text-xs text-slate-400 block mb-1'>Вход (Buy-in), ₽</label>
-              <input type='number' value={settings.buyInCost} onChange={e => handleSettingChange('buyInCost', e.target.value)} className='w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm font-mono text-white focus:outline-none focus:border-amber-500' />
+              <input type='number' min={0} value={settings.buyInCost} onChange={e => handleSettingChange('buyInCost', e.target.value)} className='w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm font-mono text-white focus:outline-none focus:border-amber-500' />
             </div>
             <div>
               <label className='text-xs text-slate-400 block mb-1'>Стартовый стек</label>
-              <input type='number' value={settings.buyInStack} onChange={e => handleSettingChange('buyInStack', e.target.value)} className='w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm font-mono text-white focus:outline-none focus:border-amber-500' />
+              <input type='number' min={0} value={settings.buyInStack} onChange={e => handleSettingChange('buyInStack', e.target.value)} className='w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm font-mono text-white focus:outline-none focus:border-amber-500' />
             </div>
           </div>
 
           <div className='grid grid-cols-2 gap-4'>
             <div>
               <label className='text-xs text-slate-400 block mb-1'>Шаг ребая (прогресс), ₽</label>
-              <input type='number' value={settings.rebuyBaseStep} onChange={e => handleSettingChange('rebuyBaseStep', e.target.value)} className='w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm font-mono text-white focus:outline-none focus:border-amber-500' />
+              <input type='number' min={0} value={settings.rebuyBaseStep} onChange={e => handleSettingChange('rebuyBaseStep', e.target.value)} className='w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm font-mono text-white focus:outline-none focus:border-amber-500' />
             </div>
             <div>
               <label className='text-xs text-slate-400 block mb-1'>Удвоение ребая при ББ от</label>
-              <input type='number' value={settings.rebuyTriggerBB} onChange={e => handleSettingChange('rebuyTriggerBB', e.target.value)} className='w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm font-mono text-white focus:outline-none focus:border-amber-500' />
+              <input type='number' min={0} value={settings.rebuyTriggerBB} onChange={e => handleSettingChange('rebuyTriggerBB', e.target.value)} className='w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm font-mono text-white focus:outline-none focus:border-amber-500' />
             </div>
           </div>
 
           <div className='grid grid-cols-3 gap-3 border-t border-slate-800/60 pt-4'>
             <div>
               <label className='text-xxs text-slate-400 block mb-1'>Цена аддона, ₽</label>
-              <input type='number' value={settings.addonCost} onChange={e => handleSettingChange('addonCost', e.target.value)} className='w-full bg-slate-950 border border-slate-800 rounded-xl px-2 py-2 text-xs font-mono text-white focus:outline-none focus:border-amber-500' />
+              <input type='number' min={0} value={settings.addonCost} onChange={e => handleSettingChange('addonCost', e.target.value)} className='w-full bg-slate-950 border border-slate-800 rounded-xl px-2 py-2 text-xs font-mono text-white focus:outline-none focus:border-amber-500' />
             </div>
             <div>
               <label className='text-xxs text-slate-400 block mb-1'>Стек аддона</label>
-              <input type='number' value={settings.addonStack} onChange={e => handleSettingChange('addonStack', e.target.value)} className='w-full bg-slate-950 border border-slate-800 rounded-xl px-2 py-2 text-xs font-mono text-white focus:outline-none focus:border-amber-500' />
+              <input type='number' min={0} value={settings.addonStack} onChange={e => handleSettingChange('addonStack', e.target.value)} className='w-full bg-slate-950 border border-slate-800 rounded-xl px-2 py-2 text-xs font-mono text-white focus:outline-none focus:border-amber-500' />
             </div>
             {/* ДОБАВЛЕНО: Указание уровня для аддона */}
             <div>
               <label className='text-xxs text-slate-400 block mb-1'>На каком ур.</label>
-              <input type='number' value={settings.addonLevel || 4} onChange={e => handleSettingChange('addonLevel', e.target.value)} className='w-full bg-slate-950 border border-slate-800 rounded-xl px-2 py-2 text-xs font-mono text-white focus:outline-none focus:border-amber-500' />
+              <input type='number' min={0} value={settings.addonLevel || 4} onChange={e => handleSettingChange('addonLevel', e.target.value)} className='w-full bg-slate-950 border border-slate-800 rounded-xl px-2 py-2 text-xs font-mono text-white focus:outline-none focus:border-amber-500' />
             </div>
           </div>
         </div>
@@ -209,18 +209,18 @@ export function SetupView() {
 
                     <td className='py-2 px-2'>{level.isBreak ? <span className='text-xs font-bold bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded'>Перерыв</span> : <span className='text-xs font-medium text-slate-400'>Игра</span>}</td>
 
-                    <td className='py-2 px-2'>{!level.isBreak && <input type='number' value={level.sb} onChange={e => handleLevelChange(index, 'sb', e.target.value)} className='w-full bg-slate-950 border border-slate-800/80 rounded-lg px-2 py-1 text-xs font-mono text-white focus:outline-none' />}</td>
+                    <td className='py-2 px-2'>{!level.isBreak && <input type='number' min={0} value={level.sb} onChange={e => handleLevelChange(index, 'sb', e.target.value)} className='w-full bg-slate-950 border border-slate-800/80 rounded-lg px-2 py-1 text-xs font-mono text-white focus:outline-none' />}</td>
 
-                    <td className='py-2 px-2'>{!level.isBreak && <input type='number' value={level.bb} onChange={e => handleLevelChange(index, 'bb', e.target.value)} className='w-full bg-slate-950 border border-slate-800/80 rounded-lg px-2 py-1 text-xs font-mono text-white focus:outline-none' />}</td>
+                    <td className='py-2 px-2'>{!level.isBreak && <input type='number' min={0} value={level.bb} onChange={e => handleLevelChange(index, 'bb', e.target.value)} className='w-full bg-slate-950 border border-slate-800/80 rounded-lg px-2 py-1 text-xs font-mono text-white focus:outline-none' />}</td>
 
-                    <td className='py-2 px-2'>{!level.isBreak && <input type='number' value={level.ante} onChange={e => handleLevelChange(index, 'ante', e.target.value)} className='w-full bg-slate-950 border border-slate-800/80 rounded-lg px-2 py-1 text-xs font-mono text-white focus:outline-none' />}</td>
+                    <td className='py-2 px-2'>{!level.isBreak && <input type='number' min={0} value={level.ante} onChange={e => handleLevelChange(index, 'ante', e.target.value)} className='w-full bg-slate-950 border border-slate-800/80 rounded-lg px-2 py-1 text-xs font-mono text-white focus:outline-none' />}</td>
 
                     {/* Раздельные инпуты под минуты и секунды */}
                     <td className='py-2 px-2'>
                       <div className='flex items-center gap-1'>
-                        <input type='number' value={minutes} onChange={e => handleTimeChange(index, 'min', e.target.value)} placeholder='15' className='w-16 bg-slate-950 border border-slate-800/80 rounded-lg px-2 py-1 text-xs font-mono text-center text-white focus:outline-none focus:border-emerald-600' />
+                        <input type='number' min={0} value={minutes} onChange={e => handleTimeChange(index, 'min', e.target.value)} placeholder='15' className='w-16 bg-slate-950 border border-slate-800/80 rounded-lg px-2 py-1 text-xs font-mono text-center text-white focus:outline-none focus:border-emerald-600' />
                         <span className='text-slate-600 font-bold'>:</span>
-                        <input type='number' value={seconds} onChange={e => handleTimeChange(index, 'sec', e.target.value)} placeholder='00' className='w-14 bg-slate-950 border border-slate-800/80 rounded-lg px-2 py-1 text-xs font-mono text-center text-white focus:outline-none focus:border-emerald-600' />
+                        <input type='number' min={0} value={seconds} onChange={e => handleTimeChange(index, 'sec', e.target.value)} placeholder='00' className='w-14 bg-slate-950 border border-slate-800/80 rounded-lg px-2 py-1 text-xs font-mono text-center text-white focus:outline-none focus:border-emerald-600' />
                       </div>
                     </td>
 

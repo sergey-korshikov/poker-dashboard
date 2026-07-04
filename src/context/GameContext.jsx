@@ -7,20 +7,34 @@ import levelUpSound from '../assets/round.mp3';
 const GameContext = createContext();
 
 const defaultSettings = {
-  title: 'Пятничный Покер',
+  title: 'Домашний турнир по покер',
   buyInCost: 400,
   buyInStack: 20000,
   rebuyBaseStep: 200,
   rebuyTriggerBB: 3000,
-  addonCost: 400,
-  addonStack: 20000,
-  addonLevel: 4, // На каком ИГРОВОМ уровне (не перерыве) доступен аддон
+  addonCost: 0,
+  addonStack: 0,
+  addonLevel: 8, // На каком ИГРОВОМ уровне (не перерыве) доступен аддон
   levels: [
     { id: 1, sb: 100, bb: 200, ante: 0, duration: 1200, isBreak: false }, // 1200 сек = 20 минут
     { id: 2, sb: 100, bb: 200, ante: 0, duration: 1200, isBreak: false },
     { id: 3, sb: 200, bb: 400, ante: 0, duration: 1200, isBreak: false },
     { id: 4, duration: 900, isBreak: true, name: 'Перерыв' }, // 900 сек = 15 минут
     { id: 5, sb: 300, bb: 600, ante: 0, duration: 1200, isBreak: false },
+    { id: 6, sb: 500, bb: 1000, ante: 0, duration: 1200, isBreak: false },
+    { id: 7, sb: 700, bb: 1400, ante: 0, duration: 1200, isBreak: false },
+    { id: 8, duration: 900, isBreak: true, name: 'Перерыв' },
+    { id: 9, sb: 1000, bb: 2000, ante: 0, duration: 1200, isBreak: false },
+    { id: 10, sb: 1500, bb: 3000, ante: 0, duration: 1200, isBreak: false },
+    { id: 11, sb: 2000, bb: 4000, ante: 0, duration: 1200, isBreak: false },
+    { id: 12, duration: 900, isBreak: true, name: 'Перерыв' },
+    { id: 13, sb: 3000, bb: 6000, ante: 0, duration: 1200, isBreak: false },
+    { id: 14, sb: 4000, bb: 8000, ante: 0, duration: 1200, isBreak: false },
+    { id: 15, sb: 5000, bb: 10000, ante: 0, duration: 1200, isBreak: false },
+    { id: 16, duration: 900, isBreak: true, name: 'Перерыв' },
+    { id: 17, sb: 10000, bb: 20000, ante: 0, duration: 1200, isBreak: false },
+    { id: 18, sb: 20000, bb: 40000, ante: 0, duration: 1200, isBreak: false },
+    { id: 19, sb: 30000, bb: 60000, ante: 0, duration: 1200, isBreak: false },
   ],
 };
 
@@ -224,17 +238,53 @@ export const GameProvider = ({ children }) => {
 
   // ПОКЕРНАЯ ЭКОНОМИКА С ПОДДЕРЖКОЙ RE-ENTRY
   const calculateNextRebuy = playerName => {
-    const playerRebuysCount = events.filter(e => e.type === 'REBUY' && e.playerName === playerName).length;
-    const currentLevel = settings.levels[currentLevelIndex];
-    const isHeavyBlinds = currentLevel && currentLevel.bb >= settings.rebuyTriggerBB;
+    // 1. Извлекаем все ребаи игрока в хронологическом порядке (от старых к новым)
+    const playerRebuyEvents = events.filter(e => e.type === 'REBUY' && e.playerName === playerName);
 
-    let cost = settings.buyInCost;
-    if (isHeavyBlinds) {
-      cost = settings.buyInCost * Math.pow(2, playerRebuysCount);
+    const currentLevel = settings.levels[currentLevelIndex];
+    const isHeavyBlindsNow = currentLevel && currentLevel.bb >= settings.rebuyTriggerBB;
+
+    // 2. Начинаем расчет стоимости «следующего» ребая
+    let currentCost = settings.buyInCost;
+
+    // 3. Симулируем историю: как росла бы цена игрока за КАЖДЫЙ его прошлый ребай
+    playerRebuyEvents.forEach((event, index) => {
+      // Нам важно знать, в какой момент турнира был сделан этот конкретный прошлый ребай.
+      // Но у нас есть железное правило из вашего примера:
+      // Если цена этого сделанного ребая была уже "тяжелой" (то есть >= удвоенной стартовой цене, 800р и выше),
+      // значит, этот ребай делался на тяжелой стадии, и после него цена должна удваиваться.
+
+      if (event.cost >= settings.buyInCost * 2) {
+        currentCost = event.cost * 2;
+      } else {
+        // Если ребай стоил меньше 800р (400 или 600), значит он делался на ранней стадии,
+        // и после него цена росла обычным шагом в 200р
+        currentCost = event.cost + settings.rebuyBaseStep;
+      }
+    });
+
+    // 4. ТЕКУЩИЙ КЛИК (Расчет цены для ребая, который игрок хочет сделать ПРЯМО СЕЙЧАС):
+    // Если наступила тяжелая стадия, а игрок еще не заходил на нее (его текущая накопленная цена
+    // еще не была удвоена), мы должны принудительно удвоить её прямо сейчас.
+    if (isHeavyBlindsNow) {
+      // Проверяем: если последний ребай в истории уже был дорогим (800+),
+      // значит, текущая цена currentCost уже рассчитана с учетом удвоения на предыдущем шаге (внутри цикла).
+      // А вот если ребаев не было вообще или последний ребай был дешевым (до перехода) —
+      // это значит, что игрок ПЕРВЫЙ РАЗ покупает ребай на тяжелой стадии. Удваиваем его накопленную цену!
+      const lastEvent = playerRebuyEvents[playerRebuyEvents.length - 1];
+      const alreadyDoubledInHistory = lastEvent && lastEvent.cost >= settings.buyInCost * 2;
+
+      if (!alreadyDoubledInHistory) {
+        currentCost = currentCost * 2;
+      }
     } else {
-      cost = settings.buyInCost + playerRebuysCount * settings.rebuyBaseStep;
+      // Если стадия ранняя — цена остается такой, какой ее накопил цикл (базовая + шаги по 200р)
     }
-    return { cost, stack: settings.buyInStack };
+
+    return {
+      cost: currentCost,
+      stack: settings.buyInStack,
+    };
   };
 
   const addPlayer = nameOrArray => {
