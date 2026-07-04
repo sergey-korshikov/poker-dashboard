@@ -157,7 +157,7 @@ export const GameProvider = ({ children }) => {
       // СЦЕНАРИЙ 1: Воспроизведение вашего качественного MP3 файла
       if (type === 'LEVEL_UP') {
         const audio = new Audio(levelUpSound);
-        audio.volume = 0.6;
+        audio.volume = 1;
         audio.play().catch(e => console.log('Браузер заблокировал автозвук:', e));
       }
 
