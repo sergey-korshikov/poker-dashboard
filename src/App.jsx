@@ -6,12 +6,12 @@ import { SetupView } from './views/SetupView';
 import { SummaryView } from './views/SummaryView';
 
 export default function App() {
-  const [currentView, setCurrentView] = useState('board');
+  const [currentPage, setCurrentPage] = useState('board');
   const { isTimerRunning, toggleTimer, handleNextLevel, handlePrevLevel, showCurrency, setShowCurrency, stats, players } = useGame();
 
   useEffect(() => {
     if (players.length > 1 && stats.playersInGame === 1) {
-      setCurrentView('summary');
+      setCurrentPage('summary');
     }
   }, [stats.playersInGame, players.length]);
 
@@ -46,16 +46,16 @@ export default function App() {
 
         {/* ЦЕНТРАЛЬНАЯ ЧАСТЬ: Пульт переключения экранов */}
         <nav className='flex items-center bg-slate-950 p-1 rounded-lg border border-slate-850 h-10 w-full lg:w-auto justify-between lg:justify-start'>
-          <button onClick={() => setCurrentView('board')} className={`flex-1 lg:flex-none px-4 lg:px-6 h-8 rounded text-[11px] sm:text-xs font-medium tracking-wide transition-all duration-150 cursor-pointer ${currentView === 'board' ? 'bg-white text-black font-semibold' : 'text-slate-400 hover:text-slate-200'}`}>
+          <button onClick={() => setCurrentPage('board')} className={`flex-1 lg:flex-none px-4 lg:px-6 h-8 rounded text-[11px] sm:text-xs font-medium tracking-wide transition-all duration-150 cursor-pointer ${currentPage === 'board' ? 'bg-white text-black font-semibold' : 'text-slate-400 hover:text-slate-200'}`}>
             Табло
           </button>
-          <button onClick={() => setCurrentView('stats')} className={`flex-1 lg:flex-none px-4 lg:px-6 h-8 rounded text-[11px] sm:text-xs font-medium tracking-wide transition-all duration-150 cursor-pointer ${currentView === 'stats' ? 'bg-white text-black font-semibold' : 'text-slate-400 hover:text-slate-200'}`}>
+          <button onClick={() => setCurrentPage('stats')} className={`flex-1 lg:flex-none px-4 lg:px-6 h-8 rounded text-[11px] sm:text-xs font-medium tracking-wide transition-all duration-150 cursor-pointer ${currentPage === 'stats' ? 'bg-white text-black font-semibold' : 'text-slate-400 hover:text-slate-200'}`}>
             Статистика
           </button>
-          <button onClick={() => setCurrentView('setup')} className={`flex-1 lg:flex-none px-4 lg:px-6 h-8 rounded text-[11px] sm:text-xs font-medium tracking-wide transition-all duration-150 cursor-pointer ${currentView === 'setup' ? 'bg-white text-black font-semibold' : 'text-slate-400 hover:text-slate-200'}`}>
+          <button onClick={() => setCurrentPage('setup')} className={`flex-1 lg:flex-none px-4 lg:px-6 h-8 rounded text-[11px] sm:text-xs font-medium tracking-wide transition-all duration-150 cursor-pointer ${currentPage === 'setup' ? 'bg-white text-black font-semibold' : 'text-slate-400 hover:text-slate-200'}`}>
             Настройки
           </button>
-          <button onClick={() => setCurrentView('summary')} className={`flex-1 lg:flex-none px-4 lg:px-6 h-8 rounded text-[11px] sm:text-xs font-medium tracking-wide transition-all duration-150 cursor-pointer ${currentView === 'summary' ? 'bg-white text-black font-semibold' : 'text-slate-400 hover:text-slate-200'}`}>
+          <button onClick={() => setCurrentPage('summary')} className={`flex-1 lg:flex-none px-4 lg:px-6 h-8 rounded text-[11px] sm:text-xs font-medium tracking-wide transition-all duration-150 cursor-pointer ${currentPage === 'summary' ? 'bg-white text-black font-semibold' : 'text-slate-400 hover:text-slate-200'}`}>
             Итоги
           </button>
         </nav>
@@ -66,10 +66,10 @@ export default function App() {
 
       {/* ОСНОВНОЙ КОНТЕНТ: Естественный скролл всей страницы, подвал больше ничего не зажимает */}
       <main className='flex-1 p-3 sm:p-6 bg-slate-950'>
-        {currentView === 'board' && <BoardView />}
-        {currentView === 'stats' && <StatsView />}
-        {currentView === 'setup' && <SetupView />}
-        {currentView === 'summary' && <SummaryView />}
+        {currentPage === 'board' && <BoardView />}
+        {currentPage === 'stats' && <StatsView />}
+        {currentPage === 'setup' && <SetupView />}
+        {currentPage === 'summary' && <SummaryView />}
       </main>
     </div>
   );
